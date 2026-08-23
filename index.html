@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MotoLease SA — Transaction Entry</title>
+<style>
+  :root {
+    --black: #0a0a0a;
+    --panel: #151515;
+    --panel-2: #1e1e1e;
+    --red: #d81e2c;
+    --red-dim: #7a1017;
+    --text: #f2f2f2;
+    --text-dim: #9a9a9a;
+    --border: #2a2a2a;
+    --green: #2ecc71;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--black);
+    color: var(--text);
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh;
+  }
+  header {
+    padding: 24px 20px 16px;
+    border-bottom: 2px solid var(--red-dim);
+    text-align: center;
+  }
+  header .logo {
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: 1px;
+  }
+  header .logo span { color: var(--red); }
+  header .motto {
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--text-dim);
+    margin-top: 4px;
+  }
+  main {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 20px 16px 60px;
+  }
+  .card {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 18px;
+    margin-bottom: 16px;
+  }
+  .field { margin-bottom: 16px; }
+  .field:last-child { margin-bottom: 0; }
+  label {
+    display: block;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+  input, select, textarea {
+    width: 100%;
+    background: var(--panel-2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 11px 12px;
+    border-radius: 6px;
+    font-size: 15px;
+    font-family: inherit;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--red);
+  }
+  textarea { resize: vertical; min-height: 60px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .hidden { display: none !important; }
+  button[type="submit"] {
+    width: 100%;
+    background: var(--red);
+    color: #fff;
+    border: none;
+    padding: 15px;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    margin-top: 4px;
+  }
+  button[type="submit"]:active { background: var(--red-dim); }
+  button[type="submit"]:disabled { opacity: 0.5; }
+  .status {
+    text-align: center;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    display: none;
+  }
+  .status.ok { display: block; background: rgba(46,204,113,0.15); border: 1px solid var(--green); color: var(--green); }
+  .status.err { display: block; background: rgba(216,30,44,0.15); border: 1px solid var(--red); color: #ff8a90; }
+  .section-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--red);
+    margin: 4px 0 12px;
+    font-weight: 700;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">MOTO<span>LEASE</span> SA</div>
+  <div class="motto">RIDE . EARN . GROW</div>
+</header>
+
+<main>
+  <div id="status" class="status"></div>
+
+  <form id="txForm">
+    <div class="card">
+      <div class="section-label">Transaction</div>
+      <div class="row2">
+        <div class="field">
+          <label for="date">Date</label>
+          <input type="date" id="date" required>
+        </div>
+        <div class="field">
+          <label for="type">Type</label>
+          <select id="type" required>
+            <option value="" disabled selected>Select</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label for="category">Category</label>
+        <select id="category" required disabled>
+          <option value="" disabled selected>Select type first</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="amount">Amount (R)</label>
+        <input type="number" id="amount" step="0.01" min="0" required>
+      </div>
+      <div class="field">
+        <label for="fundingSource">Funding Source</label>
+        <select id="fundingSource">
+          <option value="" disabled selected>Select</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-label">Bike &amp; Driver</div>
+      <div class="field">
+        <label for="bike">Bike</label>
+        <select id="bike">
+          <option value="NB">NB — No bike</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="driver">Driver</label>
+        <select id="driver">
+          <option value="">ND — No driver</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="contactNumber">Contact Number</label>
+        <input type="text" id="contactNumber" placeholder="ND">
+      </div>
+    </div>
+
+    <div class="card hidden" id="partsCard">
+      <div class="section-label">Parts</div>
+      <div class="field">
+        <label for="sku">SKU / Part</label>
+        <select id="sku">
+          <option value="" disabled selected>Select part</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="qty">Qty</label>
+        <input type="number" id="qty" min="1" step="1" value="1">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="section-label">Notes</div>
+      <div class="field">
+        <label for="notes">Notes</label>
+        <textarea id="notes" placeholder="Context, reference, anything worth remembering later"></textarea>
+      </div>
+      <div class="field">
+        <label for="paidTo">Paid To</label>
+        <input type="text" id="paidTo" placeholder="Optional">
+      </div>
+      <div class="field">
+        <label for="enteredBy">Entered By</label>
+        <input type="text" id="enteredBy" placeholder="Your name">
+      </div>
+    </div>
+
+    <button type="submit" id="submitBtn">Log Transaction</button>
+  </form>
+</main>
+
+<script>
+// Point this at your Apps Script deployment URL (Deploy > New deployment > Web app)
+const API_URL = 'PASTE_YOUR_APPS_SCRIPT_WEB_APP_URL_HERE';
+
+const PARTS_CATEGORIES = ['Parts Sales', 'Parts Sales - EFT', 'Parts Internal use'];
+
+let formData = { categoryMap: {}, fundingSources: [], drivers: [], bikes: [], parts: [] };
+
+const el = id => document.getElementById(id);
+
+function setStatus(msg, kind) {
+  const s = el('status');
+  s.textContent = msg;
+  s.className = 'status ' + kind;
+}
+
+async function loadFormData() {
+  try {
+    const res = await fetch(API_URL + '?action=formData');
+    formData = await res.json();
+    populateStaticDropdowns();
+  } catch (err) {
+    setStatus('Could not load form data. Check your connection and try again.', 'err');
+  }
+}
+
+function populateStaticDropdowns() {
+  const typeSel = el('type');
+  Object.keys(formData.categoryMap).forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t; opt.textContent = t;
+    typeSel.appendChild(opt);
+  });
+
+  const fundingSel = el('fundingSource');
+  formData.fundingSources.forEach(f => {
+    const opt = document.createElement('option');
+    opt.value = f; opt.textContent = f;
+    fundingSel.appendChild(opt);
+  });
+
+  const bikeSel = el('bike');
+  formData.bikes.forEach(b => {
+    const opt = document.createElement('option');
+    opt.value = b['Bike ID']; opt.textContent = b['Bike ID'] + (b['Make'] ? ' — ' + b['Make'] + ' ' + b['Model'] : '');
+    bikeSel.appendChild(opt);
+  });
+
+  const driverSel = el('driver');
+  formData.drivers.forEach(d => {
+    const opt = document.createElement('option');
+    opt.value = d['Driver ID']; opt.textContent = d['Name'];
+    opt.dataset.contact = d['Contact Number'] || '';
+    driverSel.appendChild(opt);
+  });
+
+  const skuSel = el('sku');
+  formData.parts.forEach(p => {
+    const opt = document.createElement('option');
+    opt.value = p['SKU']; opt.textContent = p['SKU'] + ' — ' + p['Product Name'];
+    opt.dataset.name = p['Product Name'];
+    skuSel.appendChild(opt);
+  });
+}
+
+el('type').addEventListener('change', () => {
+  const type = el('type').value;
+  const catSel = el('category');
+  catSel.innerHTML = '';
+  catSel.disabled = false;
+  const placeholder = document.createElement('option');
+  placeholder.value = ''; placeholder.disabled = true; placeholder.selected = true;
+  placeholder.textContent = 'Select';
+  catSel.appendChild(placeholder);
+  (formData.categoryMap[type] || []).forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c; opt.textContent = c;
+    catSel.appendChild(opt);
+  });
+});
+
+el('category').addEventListener('change', () => {
+  const cat = el('category').value;
+  el('partsCard').classList.toggle('hidden', !PARTS_CATEGORIES.includes(cat));
+});
+
+el('driver').addEventListener('change', () => {
+  const opt = el('driver').selectedOptions[0];
+  if (opt && opt.dataset.contact) el('contactNumber').value = opt.dataset.contact;
+});
+
+el('txForm').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const btn = el('submitBtn');
+  btn.disabled = true;
+  setStatus('Logging...', 'ok');
+
+  const driverOpt = el('driver').selectedOptions[0];
+  const skuOpt = el('sku').selectedOptions[0];
+
+  const payload = {
+    date: el('date').value,
+    type: el('type').value,
+    category: el('category').value,
+    amount: el('amount').value,
+    fundingSource: el('fundingSource').value,
+    bikeId: el('bike').value,
+    driverId: el('driver').value,
+    driverName: driverOpt ? driverOpt.textContent : 'ND',
+    contactNumber: el('contactNumber').value,
+    sku: el('partsCard').classList.contains('hidden') ? '' : el('sku').value,
+    qty: el('partsCard').classList.contains('hidden') ? '' : el('qty').value,
+    partDescription: skuOpt && skuOpt.dataset.name ? skuOpt.dataset.name : '',
+    notes: el('notes').value,
+    paidTo: el('paidTo').value,
+    enteredBy: el('enteredBy').value
+  };
+
+  try {
+    const res = await fetch(API_URL, { method: 'POST', body: JSON.stringify(payload) });
+    const result = await res.json();
+    if (result.ok) {
+      setStatus('Logged as Ref #' + result.refId, 'ok');
+      el('txForm').reset();
+      el('category').innerHTML = '<option value="" disabled selected>Select type first</option>';
+      el('category').disabled = true;
+      el('partsCard').classList.add('hidden');
+      el('date').value = new Date().toISOString().slice(0, 10);
+    } else {
+      setStatus('Error: ' + result.error, 'err');
+    }
+  } catch (err) {
+    setStatus('Network error — nothing was logged. Try again.', 'err');
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+el('date').value = new Date().toISOString().slice(0, 10);
+loadFormData();
+</script>
+
+</body>
+</html>
